@@ -2,7 +2,31 @@ import { NextResponse } from 'next/server';
 
 const capabilities = {
   lastUpdated: '2026-03-20',
-  owner: 'Bryan Gillis — NorCal CARB Mobile',
+  owner: 'Bryan — NorCal CARB Mobile',
+  team: 'Bryan-Claude-Musk — BEST TEAM EVER',
+
+  domains: {
+    'norcalcarbmobile.com': {
+      purpose: 'NorCal CARB Mobile — smog business (customer-facing)',
+      hosting: 'Squarespace (last non-Cloudflare property, migrating soon)',
+    },
+    'carbcleantruckcheck.app': {
+      purpose: 'CARB Clean Truck Check compliance app',
+      hosting: 'Cloudflare',
+    },
+    'silverbackai.agency': {
+      purpose: 'SilverbackAI — AI agency',
+      hosting: 'Cloudflare',
+    },
+    'dmcproperties': {
+      purpose: 'DMC Properties — real estate/property project',
+      hosting: 'Cloudflare',
+    },
+    'chigbulaws.com': {
+      purpose: 'Law-related site',
+      hosting: 'Cloudflare',
+    },
+  },
 
   connectedServices: {
     figma: {
@@ -28,6 +52,7 @@ const capabilities = {
         'Configure Hyperdrive connections',
         'Search Cloudflare documentation',
         'Set active account',
+        'Manage DNS for all domains',
       ],
     },
     asana: {
@@ -102,7 +127,20 @@ const capabilities = {
         'Send SMS notifications to Bryan',
         'Configurable sender/receiver numbers',
       ],
-      note: 'Integrated via /api/notify route in GM Command Center',
+      note: 'Claude-managed — Bryan does not interact with Twilio directly',
+    },
+  },
+
+  aiStack: {
+    primary: {
+      name: 'Claude MAX (Anthropic)',
+      usage: 'Primary AI — Claude Code CLI, chat, API, automation',
+      models: 'Claude 4.x family, Claude 3.5 Sonnet',
+      customBots: ['Milla-claude-2426'],
+    },
+    secondary: {
+      name: 'Gemini Pro / Gemini Developer (Google)',
+      usage: 'API access, Google AI Studio',
     },
   },
 
@@ -114,22 +152,17 @@ const capabilities = {
     'claude-api': 'Build apps with Claude API / Anthropic SDK',
     'session-start-hook': 'Set up repository hooks for Claude Code web sessions',
     'update-config': 'Configure Claude Code settings, hooks, permissions, and env vars',
+    'keybindings-help': 'Customize keyboard shortcuts and bindings',
   },
 
   techStack: {
-    primary: {
-      infrastructure: 'Cloudflare (Workers, D1, KV, R2, Pages, Hyperdrive)',
-      ai: 'Claude / Anthropic API (@anthropic-ai/sdk)',
-      automation: 'OpenClaw + Make.com',
-      frontend: 'Next.js 14 + TypeScript + Tailwind CSS',
-      payments: 'Stripe (primary), PayPal (secondary)',
-      sms: 'Twilio',
-      website: 'Squarespace (norcalcarbmobile.com)',
-    },
-    hosting: {
-      current: 'Vercel (migrating to Cloudflare Pages)',
-      target: 'Cloudflare Pages',
-    },
+    infrastructure: 'Cloudflare (Workers, D1, KV, R2, Pages, Hyperdrive, DNS)',
+    ai: 'Claude MAX (primary) + Gemini Pro (secondary)',
+    automation: 'OpenClaw + Claude Code (replaced Make.com)',
+    frontend: 'Next.js 14 + TypeScript + Tailwind CSS (Claude-managed)',
+    payments: 'Stripe (primary), PayPal (secondary)',
+    sms: 'Twilio (Claude-managed)',
+    hosting: 'Cloudflare Pages (target for all projects)',
   },
 
   projectPlanningChecklist: [
@@ -137,16 +170,18 @@ const capabilities = {
     'Does it need file storage? → Cloudflare R2',
     'Does it need caching or config? → Cloudflare KV',
     'Does it need an API? → Cloudflare Worker',
-    'Does it need a UI? → Next.js on Cloudflare Pages',
-    'Does it need AI? → Claude API',
-    'Does it need automation? → OpenClaw or Make.com',
-    'Does it need to send emails? → Gmail integration',
-    'Does it need to send texts? → Twilio',
-    'Does it need team notifications? → Slack',
-    'Does it need scheduling? → Google Calendar',
-    'Does it need task tracking? → Asana',
-    'Does it need design work? → Figma',
+    'Does it need a UI? → Cloudflare Pages',
+    'Does it need AI (primary)? → Claude API',
+    'Does it need AI (secondary)? → Gemini API / AI Studio',
+    'Does it need automation? → OpenClaw + Claude Code',
+    'Does it need to send emails? → Gmail MCP',
+    'Does it need to send texts? → Twilio (Claude sets it up)',
+    'Does it need team notifications? → Slack MCP',
+    'Does it need scheduling? → Google Calendar MCP',
+    'Does it need task tracking? → Asana MCP',
+    'Does it need design work? → Figma MCP',
     'Does it need payments? → Stripe',
+    'Does it need a domain? → Cloudflare DNS',
   ],
 };
 
