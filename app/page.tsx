@@ -27,14 +27,14 @@ export default function Home() {
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              GM COMMAND CENTER
+              <span className="text-[#facc15]">SILVERBACK</span>AI
             </h1>
             <p className="text-sm text-gray-400 mt-0.5">
               NorCal CARB Mobile &mdash; Bryan Gillis &mdash; License IF530523
             </p>
           </div>
           <div className="text-right text-xs text-gray-500">
-            <p>OPERATION: GET SHIT DONE</p>
+            <p>COMMAND CENTER</p>
             <p className="text-[#facc15]">SYSTEM ONLINE</p>
           </div>
         </div>

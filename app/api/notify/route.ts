@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const client = twilio(accountSid, authToken);
 
     const result = await client.messages.create({
-      body: `[GM Command Center] ${message}`,
+      body: `[SilverbackAI] ${message}`,
       from: fromNumber,
       to: toNumber,
     });

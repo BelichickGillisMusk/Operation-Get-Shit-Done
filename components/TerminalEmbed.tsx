@@ -51,7 +51,7 @@ export default function TerminalEmbed() {
     terminalInstance.current = term;
 
     term.writeln('\x1b[32m╔══════════════════════════════════════════════════════╗\x1b[0m');
-    term.writeln('\x1b[32m║\x1b[0m  \x1b[1;33mGM COMMAND CENTER\x1b[0m // \x1b[1;32mTERMINAL ONLINE\x1b[0m              \x1b[32m║\x1b[0m');
+    term.writeln('\x1b[32m║\x1b[0m  \x1b[1;33mSILVERBACKAI\x1b[0m // \x1b[1;32mTERMINAL ONLINE\x1b[0m                   \x1b[32m║\x1b[0m');
     term.writeln('\x1b[32m║\x1b[0m  \x1b[90mNorCal CARB Mobile — Tactical Operations\x1b[0m          \x1b[32m║\x1b[0m');
     term.writeln('\x1b[32m╚══════════════════════════════════════════════════════╝\x1b[0m');
     term.writeln('');
@@ -71,7 +71,7 @@ export default function TerminalEmbed() {
     // term.onData((data) => ws.send(data));
 
     let commandBuffer = '';
-    const prompt = '\x1b[32mgm@command-center\x1b[0m:\x1b[34m~\x1b[0m$ ';
+    const prompt = '\x1b[32msilverback@ops\x1b[0m:\x1b[34m~\x1b[0m$ ';
 
     term.write(prompt);
 
@@ -133,7 +133,7 @@ export default function TerminalEmbed() {
           <div className="w-3 h-3 rounded-full bg-green-500/80" />
         </div>
         <span className="text-xs text-gray-500 font-mono ml-2">
-          gm-terminal — bash
+          silverback-terminal — bash
         </span>
       </div>
       <div

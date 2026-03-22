@@ -2,8 +2,15 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GM Command Center | Operation Get Shit Done',
-  description: 'Command center for NorCal CARB Mobile — Bryan Gillis',
+  title: 'SilverbackAI — Command Center',
+  description: 'AI-powered operations command center for NorCal CARB Mobile — Bryan Gillis',
+  metadataBase: new URL('https://silverbackai.agency'),
+  openGraph: {
+    title: 'SilverbackAI — Command Center',
+    description: 'AI-powered operations command center for NorCal CARB Mobile',
+    siteName: 'SilverbackAI',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({

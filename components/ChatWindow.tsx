@@ -114,7 +114,7 @@ export default function ChatWindow() {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center text-gray-500 mt-12">
-            <p className="text-lg font-medium">GM Command Center Agent</p>
+            <p className="text-lg font-medium">SilverbackAI Agent</p>
             <p className="text-sm mt-2">
               Ask me anything about NorCal CARB Mobile operations, finances,
               scheduling, or growth strategy.

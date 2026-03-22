@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-const SYSTEM_PROMPT = `You are the AI operations agent for GM Command Center — the business management system for NorCal CARB Mobile, a smog inspection business owned and operated by Bryan Gillis.
+const SYSTEM_PROMPT = `You are the AI operations agent for SilverbackAI — the command center for NorCal CARB Mobile, a smog inspection business owned and operated by Bryan Gillis.
 
 BUSINESS CONTEXT:
 - Owner: Bryan Gillis
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     ];
 
     const stream = await client.messages.stream({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-6',
       max_tokens: 4096,
       system: SYSTEM_PROMPT,
       messages,
