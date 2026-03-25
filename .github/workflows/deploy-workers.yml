@@ -1,0 +1,53 @@
+name: Deploy Clean Truck Check Workers
+
+on:
+  push:
+    branches: [main, claude/*]
+    paths:
+      - 'workers/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-hayward:
+    runs-on: ubuntu-latest
+    name: Deploy Hayward (Raiders)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: bafa242dd95d3fdce72540d20accd0a2
+          workingDirectory: workers/hayward
+
+  deploy-fairfield:
+    runs-on: ubuntu-latest
+    name: Deploy Fairfield (Air Force)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: bafa242dd95d3fdce72540d20accd0a2
+          workingDirectory: workers/fairfield
+
+  deploy-roseville:
+    runs-on: ubuntu-latest
+    name: Deploy Roseville (Giants)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: bafa242dd95d3fdce72540d20accd0a2
+          workingDirectory: workers/roseville
+
+  deploy-stockton:
+    runs-on: ubuntu-latest
+    name: Deploy Stockton
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: bafa242dd95d3fdce72540d20accd0a2
+          workingDirectory: workers/stockton
