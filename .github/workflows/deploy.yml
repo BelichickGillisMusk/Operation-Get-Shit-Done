@@ -1,0 +1,35 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main, claude/*]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy SilverbackAI
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npx next build
+
+      - name: Build for Cloudflare (OpenNext)
+        run: npx opennextjs-cloudflare build
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: bafa242dd95d3fdce72540d20accd0a2
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
