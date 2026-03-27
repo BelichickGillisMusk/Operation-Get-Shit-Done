@@ -1,0 +1,82 @@
+---
+/**
+ * SEO Head — injected on every page.
+ * Handles: title, meta description, canonical, OG, Twitter,
+ * speakable CSS selectors, and AI crawler signals.
+ */
+import { getRegion, BUSINESS } from "@/config/regions";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  // Page-specific schema types for speakable
+  speakableSelectors?: string[];
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage = "/images/og-default.jpg",
+  noindex = false,
+  speakableSelectors = [".page-summary", ".key-fact", "h1"],
+} = Astro.props;
+
+const region = getRegion();
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, region.host).href;
+const ogImageUrl = ogImage.startsWith("http")
+  ? ogImage
+  : new URL(ogImage, region.host).href;
+const fullTitle = `${title} | NorCal CARB Mobile`;
+
+// Speakable schema — marks content for voice search and AI assistants
+const speakableSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: fullTitle,
+  description,
+  url: canonicalUrl,
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: speakableSelectors,
+  },
+};
+---
+
+<!-- Primary meta -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:site_name" content={BUSINESS.name} />
+
+<!-- Twitter/X Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+
+<!-- Business identity signals (not a directive — informational) -->
+<meta name="author" content={BUSINESS.owner} />
+<meta
+  name="keywords"
+  content={`diesel smog inspection, truck smog check, CARB compliance, mobile smog station, ${region.name}, fleet inspection`}
+/>
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<!-- Speakable schema — AI assistants use this to read key facts aloud -->
+<script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} />

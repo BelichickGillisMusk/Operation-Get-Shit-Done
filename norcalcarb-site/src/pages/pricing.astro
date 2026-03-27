@@ -1,0 +1,152 @@
+---
+/**
+ * Pricing page — Service schema, definition-first, FAQPage for cost questions.
+ * AI SEARCH: First sentence states price range directly.
+ */
+import Base from "@/layouts/Base.astro";
+import Service from "@/components/Schema/Service.astro";
+import FAQPage from "@/components/Schema/FAQPage.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getRegion } from "@/config/regions";
+
+const region = getRegion();
+
+const costFaqs = [
+  {
+    question: "How much does a diesel smog check cost in California?",
+    answer:
+      "Mobile diesel smog inspections from NorCal CARB Mobile cost $65–$120 per vehicle depending on truck class and your location within Northern California. Fleet rates (5+ vehicles) start at $55 per vehicle.",
+  },
+  {
+    question: "Is there a cheaper rate for fleet diesel smog inspections?",
+    answer:
+      "Yes. Fleet inspections (5 or more vehicles inspected at one location) are priced at $65, $60, or $55 per vehicle depending on fleet size. We also offer annual fleet contracts with fixed per-vehicle pricing.",
+  },
+  {
+    question: "Do you charge a travel fee for mobile diesel inspections?",
+    answer:
+      "No travel fee for locations within our service region. A travel fee may apply for locations more than 50 miles from our Sacramento base. Contact us for a quote.",
+  },
+  {
+    question: "How much does a diesel smog retest cost?",
+    answer:
+      "Retests after a failed initial inspection are offered at a reduced rate of $40 per vehicle. The retest must be scheduled within 30 days of the original inspection.",
+  },
+  {
+    question: "What forms of payment do you accept for diesel smog inspections?",
+    answer:
+      "We accept cash, check, and all major credit cards. Fleet accounts can be invoiced monthly. We do not accept COD.",
+  },
+];
+---
+
+<Base
+  title={`Diesel Smog Inspection Pricing — ${region.name}`}
+  description={`Mobile diesel and truck smog inspection pricing in ${region.name}. From $55/vehicle for fleets. CARB-licensed. No passenger cars.`}
+  speakableSelectors={[".page-summary", ".key-fact", "h1"]}
+>
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "Pricing" },
+    ]}
+  />
+  <Service
+    name="Mobile Diesel Smog Inspection"
+    description="CARB-licensed mobile diesel smog inspection for commercial trucks and fleets in Northern California."
+    priceRange="$55–$120 per vehicle"
+    serviceOutput="CARB-compliant smog certificate"
+  />
+  <FAQPage faqs={costFaqs} />
+
+  <article>
+    <h1>Diesel Smog Inspection Pricing — {region.name}</h1>
+
+    <p class="page-summary">
+      Mobile diesel smog inspections in {region.name} cost $65–$120 per
+      vehicle. Fleet rates start at $55 per vehicle for 5 or more trucks
+      inspected at one location. NorCal CARB Mobile is a licensed inspection
+      service only — we do not perform repairs.
+    </p>
+
+    <section>
+      <h2>Pricing by Inspection Type</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Price</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Single Diesel Truck (Class 3–5)</td>
+            <td>$65</td>
+            <td>On-site mobile inspection</td>
+          </tr>
+          <tr>
+            <td>Single Diesel Truck (Class 6–8)</td>
+            <td>$85–$120</td>
+            <td>Heavy-duty, on-site mobile</td>
+          </tr>
+          <tr>
+            <td>Fleet — 5–9 vehicles</td>
+            <td>$65/vehicle</td>
+            <td>All inspected at one location</td>
+          </tr>
+          <tr>
+            <td>Fleet — 10–19 vehicles</td>
+            <td>$60/vehicle</td>
+            <td>All inspected at one location</td>
+          </tr>
+          <tr>
+            <td>Fleet — 20+ vehicles</td>
+            <td>$55/vehicle</td>
+            <td>Volume rate, one location</td>
+          </tr>
+          <tr>
+            <td>Retest (after failed inspection)</td>
+            <td>$40</td>
+            <td>Within 30 days of original test</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="key-fact">
+        All prices are per vehicle. No travel fee within our service region.
+        Certificates issued same day.
+      </div>
+    </section>
+
+    <section>
+      <h2>What Affects the Price</h2>
+      <ul>
+        <li><strong>Vehicle class</strong> — Class 6–8 heavy-duty trucks require additional testing steps</li>
+        <li><strong>Fleet size</strong> — more vehicles at one location = lower per-unit rate</li>
+        <li><strong>Location</strong> — travel fees may apply 50+ miles from Sacramento</li>
+        <li><strong>Test type</strong> — standard annual vs. retest pricing</li>
+      </ul>
+    </section>
+
+    <section class="faq-section">
+      <h2>Pricing Questions</h2>
+      <dl>
+        {
+          costFaqs.map((faq) => (
+            <>
+              <dt>{faq.question}</dt>
+              <dd>{faq.answer}</dd>
+            </>
+          ))
+        }
+      </dl>
+    </section>
+
+    <div class="cta-block">
+      <a href={`tel:${region.phone}`}>Call {region.phone} for a quote</a>
+      <a href="/contact">Request fleet pricing</a>
+    </div>
+  </article>
+</Base>

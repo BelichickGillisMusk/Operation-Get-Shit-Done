@@ -1,0 +1,40 @@
+---
+/**
+ * VideoObject schema for YouTube embeds.
+ * Add this to any page with an embedded YouTube video.
+ * Each page with a video = one more AI-citable entity.
+ */
+interface Props {
+  name: string;
+  description: string;
+  youtubeId: string;
+  uploadDate: string;       // ISO 8601: "2025-09-15"
+  duration: string;         // ISO 8601: "PT3M42S"
+  thumbnailUrl?: string;    // Defaults to YouTube maxresdefault
+}
+
+const { name, description, youtubeId, uploadDate, duration, thumbnailUrl } =
+  Astro.props;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name,
+  description,
+  thumbnailUrl:
+    thumbnailUrl ?? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`,
+  uploadDate,
+  duration,
+  embedUrl: `https://www.youtube.com/embed/${youtubeId}`,
+  url: `https://www.youtube.com/watch?v=${youtubeId}`,
+  publisher: {
+    "@type": "Organization",
+    name: "NorCal CARB Mobile",
+  },
+};
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(schema)}
+/>

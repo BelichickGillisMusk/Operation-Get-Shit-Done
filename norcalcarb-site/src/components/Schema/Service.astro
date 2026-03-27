@@ -1,0 +1,49 @@
+---
+/**
+ * Service schema — for each smog inspection service page.
+ */
+import { getRegion } from "@/config/regions";
+
+interface Props {
+  name: string;
+  description: string;
+  priceRange?: string;     // e.g. "$65–$120"
+  serviceOutput?: string;  // e.g. "CARB-compliant smog certificate"
+}
+
+const { name, description, priceRange, serviceOutput } = Astro.props;
+const region = getRegion();
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name,
+  description,
+  provider: {
+    "@type": "LocalBusiness",
+    "@id": `${region.host}/#business`,
+    name: `NorCal CARB Mobile - ${region.name}`,
+  },
+  areaServed: region.cities.map((city) => ({
+    "@type": "City",
+    name: city,
+  })),
+  ...(priceRange && {
+    offers: {
+      "@type": "Offer",
+      priceSpecification: {
+        "@type": "PriceSpecification",
+        description: priceRange,
+        priceCurrency: "USD",
+      },
+      availability: "https://schema.org/InStock",
+    },
+  }),
+  ...(serviceOutput && { serviceOutput }),
+};
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(schema)}
+/>

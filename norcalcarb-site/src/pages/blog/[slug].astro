@@ -1,0 +1,95 @@
+---
+/**
+ * Blog post pages — Article schema, author linked to Person entity.
+ * AI SEARCH: CARB regulation updates, compliance guides = high AI citation potential.
+ */
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+// Blog content collection — add to content/config.ts when ready
+// For now uses a placeholder that won't error on build
+export async function getStaticPaths() {
+  try {
+    const posts = await getCollection("blog" as any, (p: any) => p.data.published !== false);
+    return posts.map((post: any) => ({
+      params: { slug: post.slug },
+      props: { post },
+    }));
+  } catch {
+    // Blog collection not yet configured — return empty
+    return [];
+  }
+}
+
+const { post } = Astro.props;
+const region = getRegion();
+
+// Article schema for blog posts — author links to Person entity
+const articleSchema = post ? {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.datePublished,
+  dateModified: post.data.dateModified ?? post.data.datePublished,
+  author: {
+    "@type": "Person",
+    "@id": `${new URL(Astro.url.origin).href}/about/#person`,
+    name: BUSINESS.owner,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: BUSINESS.name,
+  },
+} : null;
+
+const Content = post ? (await post.render()).Content : null;
+---
+
+{post ? (
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  speakableSelectors={[".page-summary", ".key-fact", "h1"]}
+>
+  {articleSchema && (
+    <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  )}
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "Blog", url: "/blog" },
+      { name: post.data.title },
+    ]}
+  />
+
+  <article>
+    <header>
+      <h1>{post.data.title}</h1>
+      <p>
+        By <a href="/about">{BUSINESS.owner}</a> &middot;
+        <time datetime={post.data.datePublished}>{post.data.datePublished}</time>
+        {post.data.dateModified && post.data.dateModified !== post.data.datePublished && (
+          <span> (Updated: <time datetime={post.data.dateModified}>{post.data.dateModified}</time>)</span>
+        )}
+      </p>
+    </header>
+
+    <div class="blog-content">
+      {Content && <Content />}
+    </div>
+
+    <div class="key-fact">
+      Written by Bryan Gillis, CARB License #{BUSINESS.license}.
+      NorCal CARB Mobile — diesel and truck smog inspection specialists.
+    </div>
+  </article>
+</Base>
+) : (
+  <Base title="Post not found" description="This blog post could not be found.">
+    <h1>Post not found</h1>
+    <a href="/blog">← Back to Blog</a>
+  </Base>
+)}

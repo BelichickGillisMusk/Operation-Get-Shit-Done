@@ -1,0 +1,23 @@
+name = "norcalcarb-site"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+
+# D1 database binding — edge SQLite for pricing, city data, testimonials
+[[d1_databases]]
+binding = "DB"
+database_name = "norcalcarb-prod"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+# R2 bucket — inspection photos, compliance guide PDFs
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "norcalcarb-assets"
+
+# Environment variables per region deploy
+# Set REGION in each Cloudflare Pages project settings:
+#   sacramento, bayarea, stockton, fresno, redding,
+#   chico, northbay, eastbay, southbay, centralcoast
+[vars]
+REGION = "sacramento"
+BUSINESS_PHONE = "916-890-4427"
+BUSINESS_LICENSE = "IF530523"

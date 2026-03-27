@@ -1,0 +1,181 @@
+---
+/**
+ * Master FAQ page — 15+ questions in prompt language, grouped by category.
+ * FAQPage schema covers all questions.
+ * AI SEARCH: This page = primary citation target for "does X need smog" queries.
+ */
+import Base from "@/layouts/Base.astro";
+import FAQPage from "@/components/Schema/FAQPage.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getCollection } from "astro:content";
+import { getRegion } from "@/config/regions";
+
+const region = getRegion();
+
+const allFaqs = await getCollection("faqs", (f) => f.data.published);
+
+// Group FAQs by category for display
+const grouped = allFaqs.reduce(
+  (acc, faq) => {
+    const cat = faq.data.category;
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(faq);
+    return acc;
+  },
+  {} as Record<string, typeof allFaqs>
+);
+
+// Build FAQ schema items from all published FAQs
+const schemaFaqs = await Promise.all(
+  allFaqs.map(async (faq) => {
+    const { Content } = await faq.render();
+    return {
+      question: faq.data.question,
+      answer: faq.body.replace(/^#+\s.+\n/gm, "").trim(), // Strip headings for schema
+    };
+  })
+);
+
+const categoryLabels: Record<string, string> = {
+  compliance: "Compliance & Legal Requirements",
+  cost: "Cost & Pricing",
+  process: "How Inspections Work",
+  "vehicle-types": "What Vehicles Need Inspection",
+  scheduling: "Scheduling & Appointments",
+  regulations: "CARB Regulations",
+};
+
+// Hardcoded FAQs to ensure minimum 15 on launch
+// These supplement any content collection FAQs
+const coreHardcodedFaqs = [
+  {
+    category: "compliance",
+    question: "Does my diesel truck need a smog check in California?",
+    answer:
+      "Yes. California's CARB Truck and Bus Regulation requires annual smog testing for diesel trucks over 14,000 lbs GVWR, model year 2000 and newer, operating on California roads.",
+  },
+  {
+    category: "compliance",
+    question: "What is the CARB Truck and Bus Regulation?",
+    answer:
+      "The CARB Truck and Bus Regulation (13 CCR §2025) requires all heavy-duty diesel trucks and buses operating in California to meet specific emissions standards. It mandates annual smog testing and in many cases requires engine or particulate filter upgrades.",
+  },
+  {
+    category: "compliance",
+    question: "Do out-of-state diesel trucks need a California smog check?",
+    answer:
+      "Yes. If a diesel truck operates on California roads — even if registered in another state — it is subject to CARB regulations including the Truck and Bus Regulation requirements. Contact us to confirm specifics for your fleet.",
+  },
+  {
+    category: "vehicle-types",
+    question: "What types of diesel vehicles need a CARB smog inspection?",
+    answer:
+      "Diesel trucks over 14,000 lbs GVWR (model year 2000+), diesel buses, diesel pickup trucks over 14,000 lbs GVWR, and certain agricultural and construction diesel vehicles. Passenger diesel cars under 14,000 lbs GVWR follow different rules — contact the DMV.",
+  },
+  {
+    category: "vehicle-types",
+    question: "Does NorCal CARB Mobile inspect passenger cars or regular trucks?",
+    answer:
+      "No. NorCal CARB Mobile specializes in diesel trucks and commercial vehicles only. We do not perform smog inspections for passenger cars, light-duty pickup trucks under 14,000 lbs GVWR, or any vehicles outside of commercial diesel equipment.",
+  },
+  {
+    category: "cost",
+    question: "How much does a diesel smog check cost in California?",
+    answer:
+      "Mobile diesel smog inspections from NorCal CARB Mobile cost $65–$120 per vehicle depending on vehicle class. Fleet rates for 5+ vehicles start at $55 per vehicle. Retests are $40.",
+  },
+  {
+    category: "process",
+    question: "How does a mobile diesel smog inspection work?",
+    answer:
+      "NorCal CARB Mobile brings certified CARB testing equipment directly to your location. We conduct an opacity test, idle emissions test, OBD-II scan (if applicable), and visual inspection of emissions control equipment. The entire process takes 20–30 minutes per vehicle. Certificates are issued on-site the same day.",
+  },
+  {
+    category: "process",
+    question: "What happens if my diesel truck fails the smog check?",
+    answer:
+      "We issue a written failure report identifying the specific emissions problem. NorCal CARB Mobile does not perform repairs — you will need to take your truck to a diesel mechanic. Once repaired, schedule a reduced-rate retest ($40) within 30 days.",
+  },
+  {
+    category: "scheduling",
+    question: "How do I schedule a mobile diesel smog inspection?",
+    answer:
+      "Call NorCal CARB Mobile at 916-890-4427 or use the online booking form at norcalcarb.com/contact. We offer same-day and next-day appointments in most cases. Fleet inspections require scheduling 24–48 hours in advance.",
+  },
+  {
+    category: "scheduling",
+    question: "Can I get a same-day diesel smog inspection?",
+    answer:
+      "Often yes. Call 916-890-4427 — same-day availability depends on current schedule and your location within our service area. Fleet inspections of 5+ vehicles typically require 24–48 hours notice.",
+  },
+  {
+    category: "regulations",
+    question: "What is the deadline to get my diesel truck smog certified in California?",
+    answer:
+      "Annual smog testing must be completed before your vehicle's CARB compliance deadline, which is tied to your registration renewal date. Failing to maintain current compliance can result in fines and registration holds. Contact the CA DMV or CARB directly for your specific deadline.",
+  },
+  {
+    category: "regulations",
+    question: "What is a Diesel Particulate Filter (DPF) and does it affect my smog test?",
+    answer:
+      "A DPF captures and reduces soot from diesel exhaust. CARB requires that DPFs are intact and functioning on applicable diesel trucks. During inspection, we verify DPF integrity visually and through opacity testing. Tampering with or removing a DPF is a CARB violation.",
+  },
+];
+---
+
+<Base
+  title={`Diesel Truck Smog Inspection FAQ — ${region.name}`}
+  description={`Answers to common questions about diesel smog checks, CARB compliance, and fleet inspection in ${region.name}. CARB-licensed mobile inspector.`}
+  speakableSelectors={[".page-summary", ".key-fact", "dt"]}
+>
+  <FAQPage faqs={[...schemaFaqs, ...coreHardcodedFaqs.map(f => ({question: f.question, answer: f.answer}))]} />
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "FAQ" },
+    ]}
+  />
+
+  <article>
+    <h1>Diesel Truck Smog Inspection FAQ — {region.name}</h1>
+
+    <p class="page-summary">
+      Answers to common questions about diesel smog checks, CARB truck
+      compliance, fleet inspection, and mobile smog services in {region.name}.
+      NorCal CARB Mobile — license #{region.license}. Diesel and commercial
+      trucks only.
+    </p>
+
+    <!-- Hardcoded core FAQs always present for AI citation coverage -->
+    {
+      Object.entries(categoryLabels).map(([cat, label]) => {
+        const catFaqs = coreHardcodedFaqs.filter((f) => f.category === cat);
+        if (catFaqs.length === 0) return null;
+        return (
+          <section>
+            <h2>{label}</h2>
+            <dl>
+              {catFaqs.map((faq) => (
+                <>
+                  <dt>{faq.question}</dt>
+                  <dd>{faq.answer}</dd>
+                </>
+              ))}
+            </dl>
+          </section>
+        );
+      })
+    }
+
+    <div class="key-fact">
+      NorCal CARB Mobile is a diesel inspection service only. We do not
+      service passenger cars and we do not perform mechanical repairs.
+      License #{region.license}.
+    </div>
+
+    <div class="cta-block">
+      <p>Still have questions?</p>
+      <a href={`tel:${region.phone}`}>Call {region.phone}</a>
+    </div>
+  </article>
+</Base>

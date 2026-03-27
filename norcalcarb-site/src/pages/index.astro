@@ -1,0 +1,185 @@
+---
+/**
+ * Homepage — definition-first hero, no welcome copy.
+ * AI SEARCH: First sentence answers "what is this" within 2 sentences.
+ * Schema: LocalBusiness (from Base), AggregateRating, FAQPage (preview).
+ */
+import Base from "@/layouts/Base.astro";
+import AggregateRating from "@/components/Schema/AggregateRating.astro";
+import FAQPage from "@/components/Schema/FAQPage.astro";
+import VideoObject from "@/components/Schema/VideoObject.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+import { getCollection } from "astro:content";
+
+const region = getRegion();
+
+// Pull featured reviews and top FAQs for homepage preview
+const allReviews = await getCollection("reviews", (r) => r.data.featured && r.data.published);
+const allFaqs = await getCollection("faqs", (f) => f.data.published);
+const topFaqs = allFaqs
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+
+const homepageFaqs = topFaqs.map((f) => ({
+  question: f.data.question,
+  answer: f.body.split("\n\n")[0], // First paragraph as answer preview
+}));
+
+// Homepage video — "How mobile diesel smog inspection works"
+const heroVideo = {
+  youtubeId: "REPLACE_WITH_YOUTUBE_ID",
+  name: "How mobile diesel smog inspection works — NorCal CARB Mobile",
+  description:
+    "Watch how NorCal CARB Mobile's mobile smog station inspects diesel trucks on-site. We bring certified CARB testing equipment to your fleet location.",
+  uploadDate: "2025-10-01",
+  duration: "PT1M32S",
+};
+---
+
+<Base
+  title={`Mobile Diesel Smog Inspection — ${region.name}`}
+  description={region.metaDescription}
+  speakableSelectors={[".page-summary", ".key-fact", "h1"]}
+>
+  <!-- Schema: AggregateRating + FAQPage preview + VideoObject -->
+  <AggregateRating />
+  <FAQPage faqs={homepageFaqs} />
+  <VideoObject
+    name={heroVideo.name}
+    description={heroVideo.description}
+    youtubeId={heroVideo.youtubeId}
+    uploadDate={heroVideo.uploadDate}
+    duration={heroVideo.duration}
+  />
+
+  <!-- HERO — Definition-first. No "welcome to". -->
+  <section class="hero">
+    <h1>Mobile Diesel & Truck Smog Inspection — {region.name}</h1>
+
+    <!-- AI SEARCH: Page summary — speakable schema targets .page-summary -->
+    <p class="page-summary">
+      NorCal CARB Mobile provides CARB-licensed mobile diesel smog inspections
+      for trucks and commercial fleets throughout {region.name}. We bring
+      certified testing equipment to your location — no driving trucks to a
+      station. License #{BUSINESS.license}.
+    </p>
+
+    <div class="hero-ctas">
+      <a href={`tel:${region.phone}`} class="cta-primary">
+        Call {region.phone}
+      </a>
+      <a href="/contact" class="cta-secondary">Book Fleet Inspection</a>
+    </div>
+
+    <!-- Key facts — AI quotable, targeted by speakable schema -->
+    <div class="key-fact">
+      We are a smog inspection service only. We do not perform mechanical
+      repairs. Diesel and commercial trucks exclusively — no passenger cars.
+    </div>
+  </section>
+
+  <!-- Hero video -->
+  <section class="hero-video">
+    <iframe
+      src={`https://www.youtube.com/embed/${heroVideo.youtubeId}`}
+      title={heroVideo.name}
+      width="560"
+      height="315"
+      loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </section>
+
+  <!-- Services strip -->
+  <section class="services-strip">
+    <h2>Diesel & Truck Inspection Services</h2>
+    <ul role="list" class="service-cards">
+      <li>
+        <a href="/services/diesel-smog-check">
+          <h3>Diesel Smog Check</h3>
+          <p>CARB-compliant mobile smog inspection for diesel trucks. $65–$120/vehicle.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/services/truck-smog-check">
+          <h3>Truck Smog Check</h3>
+          <p>Class 3–8 commercial truck emissions testing. Mobile, on-site.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/services/fleet-inspection">
+          <h3>Fleet Inspection</h3>
+          <p>On-site fleet diesel inspection from $55/vehicle (5+ trucks).</p>
+        </a>
+      </li>
+      <li>
+        <a href="/services/carb-compliance-check">
+          <h3>CARB Compliance Check</h3>
+          <p>Full compliance review under the CARB Truck &amp; Bus Regulation.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Cities served -->
+  <section class="cities-strip">
+    <h2>Cities Served — {region.name}</h2>
+    <ul role="list" class="city-list">
+      {
+        region.cities.map((city) => (
+          <li>
+            <a href={`/cities/${city.toLowerCase().replace(/\s+/g, "-")}`}>
+              {city}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- FAQ preview — prompt-language questions, AI citation targets -->
+  <section class="faq-preview">
+    <h2>Common Questions</h2>
+    <dl>
+      {
+        homepageFaqs.map((faq) => (
+          <>
+            <dt>{faq.question}</dt>
+            <dd>{faq.answer}</dd>
+          </>
+        ))
+      }
+    </dl>
+    <a href="/faq">View all questions →</a>
+  </section>
+
+  <!-- Reviews strip -->
+  {
+    allReviews.length > 0 && (
+      <section class="reviews-strip">
+        <h2>What Fleet Operators Say</h2>
+        <ul role="list">
+          {allReviews.map(async (review) => {
+            const { Content } = await review.render();
+            return (
+              <li>
+                <blockquote>
+                  <Content />
+                  <footer>
+                    — {review.data.contactName},{" "}
+                    {review.data.companyName}, {review.data.city}
+                    {review.data.fleetSize && (
+                      <span> · {review.data.fleetSize}-truck fleet</span>
+                    )}
+                  </footer>
+                </blockquote>
+              </li>
+            );
+          })}
+        </ul>
+        <a href="/reviews">Read all reviews →</a>
+      </section>
+    )
+  }
+</Base>

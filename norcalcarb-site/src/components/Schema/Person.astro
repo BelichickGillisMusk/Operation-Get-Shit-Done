@@ -1,0 +1,42 @@
+---
+/**
+ * Person schema — Bryan Gillis author entity.
+ * Lives at /about/#person — all service/blog pages reference this @id.
+ * This is the E-E-A-T anchor for AI citation confidence.
+ */
+import { getRegion, BUSINESS } from "@/config/regions";
+
+const region = getRegion();
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${region.host}/about/#person`,
+  name: BUSINESS.owner,
+  jobTitle: "CARB-Licensed Diesel Smog Inspector",
+  description:
+    "Bryan Gillis is a California-licensed mobile diesel smog inspector specializing in commercial trucks and fleet emissions compliance under CARB regulations.",
+  telephone: BUSINESS.phone,
+  email: BUSINESS.email,
+  url: `${region.host}/about`,
+  worksFor: {
+    "@type": "LocalBusiness",
+    "@id": `${region.host}/#business`,
+    name: BUSINESS.name,
+  },
+  hasCredential: {
+    "@type": "EducationalOccupationalCredential",
+    credentialCategory: "license",
+    name: "California CARB Smog Inspector License",
+    identifier: BUSINESS.license,
+  },
+  knowsAbout: BUSINESS.knowsAbout,
+  // Add LinkedIn/social URLs to BUSINESS.sameAs in regions.ts
+  sameAs: BUSINESS.sameAs,
+};
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(schema)}
+/>

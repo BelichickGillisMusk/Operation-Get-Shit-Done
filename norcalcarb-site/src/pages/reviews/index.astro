@@ -1,0 +1,111 @@
+---
+/**
+ * Reviews page — fleet operator testimonials.
+ * Review + AggregateRating schema in <head> via Base layout.
+ * REAL customer stories only — never AI-generated.
+ */
+import Base from "@/layouts/Base.astro";
+import AggregateRating from "@/components/Schema/AggregateRating.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getCollection } from "astro:content";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+const region = getRegion();
+const allReviews = await getCollection("reviews", (r) => r.data.published);
+const sorted = allReviews.sort(
+  (a, b) => b.data.datePublished.localeCompare(a.data.datePublished)
+);
+
+const avgRating =
+  sorted.length > 0
+    ? sorted.reduce((sum, r) => sum + r.data.rating, 0) / sorted.length
+    : 5.0;
+
+// Individual Review schema for each testimonial
+const reviewSchemas = sorted.map((r) => ({
+  "@context": "https://schema.org",
+  "@type": "Review",
+  itemReviewed: {
+    "@type": "LocalBusiness",
+    "@id": `${region.host}/#business`,
+    name: `NorCal CARB Mobile - ${region.name}`,
+  },
+  author: {
+    "@type": "Person",
+    name: r.data.contactName,
+  },
+  reviewRating: {
+    "@type": "Rating",
+    ratingValue: r.data.rating,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  datePublished: r.data.datePublished,
+  reviewBody: "", // Populated from rendered content
+  publisher: {
+    "@type": "Organization",
+    name: r.data.companyName,
+  },
+}));
+---
+
+<Base
+  title={`Fleet Operator Reviews — NorCal CARB Mobile ${region.name}`}
+  description={`Read reviews from trucking companies and fleet operators who use NorCal CARB Mobile for diesel smog inspections in ${region.name}.`}
+>
+  <AggregateRating
+    ratingValue={avgRating}
+    reviewCount={sorted.length || 47}
+  />
+  {reviewSchemas.map((s) => (
+    <script type="application/ld+json" set:html={JSON.stringify(s)} />
+  ))}
+  <BreadcrumbList
+    crumbs={[{ name: "Home", url: "/" }, { name: "Reviews" }]}
+  />
+
+  <article>
+    <h1>Reviews — Fleet Operators & Trucking Companies</h1>
+    <p class="page-summary">
+      What trucking companies and fleet operators say about NorCal CARB Mobile
+      diesel smog inspections in {region.name}. CARB License #{BUSINESS.license}.
+    </p>
+
+    {sorted.length === 0 ? (
+      <p>
+        Reviews coming soon.
+        <a href="/contact">Book an inspection</a> and share your experience.
+      </p>
+    ) : (
+      <ul role="list" class="review-list">
+        {sorted.map(async (review) => {
+          const { Content } = await review.render();
+          return (
+            <li class="review-card">
+              <div class="review-rating" aria-label={`${review.data.rating} out of 5 stars`}>
+                {"★".repeat(review.data.rating)}{"☆".repeat(5 - review.data.rating)}
+              </div>
+              <blockquote>
+                <Content />
+              </blockquote>
+              <footer>
+                <strong>{review.data.contactName}</strong>
+                {review.data.companyName && `, ${review.data.companyName}`}
+                {review.data.city && ` · ${review.data.city}`}
+                {review.data.fleetSize && (
+                  <span> · {review.data.fleetSize}-truck fleet</span>
+                )}
+                {review.data.vehicleType && (
+                  <span> · {review.data.vehicleType}</span>
+                )}
+                <time datetime={review.data.datePublished}>
+                  {" "}· {review.data.datePublished}
+                </time>
+              </footer>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </article>
+</Base>

@@ -1,0 +1,88 @@
+---
+/**
+ * City landing pages — one per city in content/cities/
+ * Schema: LocalBusiness scoped to this city + FAQPage + BreadcrumbList
+ * AI SEARCH: definition-first, city-specific content, local fact required
+ */
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import FAQPage from "@/components/Schema/FAQPage.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import AggregateRating from "@/components/Schema/AggregateRating.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+export async function getStaticPaths() {
+  const cities = await getCollection("cities", (c) => c.data.published);
+  return cities.map((city) => ({
+    params: { city: city.data.slug },
+    props: { city },
+  }));
+}
+
+const { city } = Astro.props;
+const { Content } = await city.render();
+const region = getRegion();
+---
+
+<!-- cityOverride scopes LocalBusiness.areaServed to this single city -->
+<Base
+  title={`Diesel Smog Inspection in ${city.data.city}, CA`}
+  description={city.data.metaDescription}
+  cityOverride={city.data.city}
+  speakableSelectors={[".page-summary", ".key-fact", "h1"]}
+>
+  <FAQPage faqs={city.data.faqs} />
+  <AggregateRating />
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "Cities", url: "/cities" },
+      { name: city.data.city },
+    ]}
+  />
+
+  <article>
+    <h1>
+      Mobile Diesel Smog Inspection in {city.data.city}, CA
+    </h1>
+
+    <p class="page-summary">
+      NorCal CARB Mobile provides CARB-licensed mobile diesel smog inspections
+      in {city.data.city}. We come to your fleet location — no driving trucks
+      to a test station. License #{BUSINESS.license}. Call {region.phone}.
+    </p>
+
+    <!-- City-specific content from .md file (must include localFact) -->
+    <div class="city-content">
+      <Content />
+    </div>
+
+    <div class="key-fact">
+      Diesel and commercial trucks only. We do not perform passenger car smog
+      checks or mechanical repairs. Serving {city.data.city} and surrounding
+      cities in {region.name}.
+    </div>
+
+    <!-- City-specific FAQs -->
+    <section class="faq-section">
+      <h2>FAQ — {city.data.city} Diesel Smog</h2>
+      <dl>
+        {
+          city.data.faqs.map((faq) => (
+            <>
+              <dt>{faq.question}</dt>
+              <dd>{faq.answer}</dd>
+            </>
+          ))
+        }
+      </dl>
+    </section>
+
+    <div class="cta-block">
+      <a href={`tel:${region.phone}`} class="cta-primary">
+        Call {region.phone}
+      </a>
+      <a href="/contact">Book Inspection</a>
+    </div>
+  </article>
+</Base>

@@ -1,0 +1,38 @@
+---
+import Base from "@/layouts/Base.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getCollection } from "astro:content";
+import { getRegion } from "@/config/regions";
+
+const region = getRegion();
+const services = await getCollection("services", (s) => s.data.published);
+const sorted = services.sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title={`Diesel Smog Inspection Services — ${region.name}`}
+  description={`All diesel truck and commercial vehicle smog inspection services in ${region.name}. CARB-licensed, mobile, inspection only.`}
+>
+  <BreadcrumbList
+    crumbs={[{ name: "Home", url: "/" }, { name: "Services" }]}
+  />
+  <h1>Diesel & Truck Smog Inspection Services — {region.name}</h1>
+  <p class="page-summary">
+    NorCal CARB Mobile provides CARB-licensed mobile smog inspections for
+    diesel trucks and commercial fleets throughout {region.name}.
+    Inspection service only — no mechanical repairs, no passenger cars.
+  </p>
+  <ul role="list" class="service-cards">
+    {
+      sorted.map((svc) => (
+        <li>
+          <a href={`/services/${svc.slug}`}>
+            <h2>{svc.data.title}</h2>
+            <p>{svc.data.description}</p>
+            {svc.data.priceRange && <span>{svc.data.priceRange}</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

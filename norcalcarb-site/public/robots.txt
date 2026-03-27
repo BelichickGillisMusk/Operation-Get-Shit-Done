@@ -1,0 +1,44 @@
+# NorCal CARB Mobile — robots.txt
+# Explicitly allow ALL AI crawlers — this is intentional for AI search citation
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+# Bing (also feeds ChatGPT Search index)
+User-agent: Bingbot
+Allow: /
+
+# OpenAI / ChatGPT Search crawler
+User-agent: OAI-SearchBot
+Allow: /
+
+# GPTBot — OpenAI training crawler (allow for brand exposure)
+User-agent: GPTBot
+Allow: /
+
+# Anthropic (Claude)
+User-agent: anthropic-ai
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# You.com
+User-agent: YouBot
+Allow: /
+
+# Common
+User-agent: Applebot
+Allow: /
+
+# Sitemap location (updated per region on deploy via env var)
+# Each regional subdomain has its own sitemap
+Sitemap: /sitemap-index.xml

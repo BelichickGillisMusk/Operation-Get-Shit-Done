@@ -1,0 +1,171 @@
+---
+/**
+ * Contact / Book Inspection page.
+ * SAB: No storefront address. Service area map only.
+ * Form submits to Cloudflare Worker — no JS required for basic function.
+ */
+import Base from "@/layouts/Base.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+const region = getRegion();
+
+// Form action — Cloudflare Worker endpoint
+// The worker validates and sends to email / Twilio SMS
+const FORM_ACTION = "/api/contact";
+---
+
+<Base
+  title={`Book Diesel Smog Inspection — ${region.name}`}
+  description={`Schedule a mobile diesel smog inspection in ${region.name}. Call ${region.phone} or book online. CARB-licensed, we come to your fleet location.`}
+>
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "Contact / Book" },
+    ]}
+  />
+
+  <article>
+    <h1>Book a Diesel Smog Inspection — {region.name}</h1>
+
+    <p class="page-summary">
+      Schedule your mobile diesel smog inspection in {region.name}.
+      Call <a href={`tel:${region.phone}`}>{region.phone}</a> for same-day
+      appointments, or use the form below for fleet bookings. We come to your
+      location.
+    </p>
+
+    <div class="contact-grid">
+      <!-- Direct contact -->
+      <section class="contact-direct">
+        <h2>Call or Text</h2>
+        <a href={`tel:${region.phone}`} class="phone-cta">{region.phone}</a>
+        <p>Mon–Fri 7am–6pm · Sat 8am–2pm</p>
+        <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>
+
+        <div class="key-fact">
+          We inspect diesel trucks and commercial vehicles only.
+          We do not perform passenger car smog checks.
+        </div>
+      </section>
+
+      <!-- Fleet booking form — no-JS capable via Cloudflare Worker POST -->
+      <section class="contact-form">
+        <h2>Fleet Inspection Request</h2>
+        <form
+          method="POST"
+          action={FORM_ACTION}
+          id="fleet-booking-form"
+        >
+          <label for="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            autocomplete="name"
+            placeholder="Your name"
+          />
+
+          <label for="company">Company</label>
+          <input
+            type="text"
+            id="company"
+            name="company"
+            autocomplete="organization"
+            placeholder="Company name (optional)"
+          />
+
+          <label for="phone">Phone Number</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            required
+            autocomplete="tel"
+            placeholder="Best number to reach you"
+          />
+
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            autocomplete="email"
+            placeholder="your@email.com (optional)"
+          />
+
+          <label for="fleet-size">Number of Vehicles to Inspect</label>
+          <select id="fleet-size" name="fleet_size" required>
+            <option value="">Select fleet size</option>
+            <option value="1">1 vehicle</option>
+            <option value="2-4">2–4 vehicles</option>
+            <option value="5-9">5–9 vehicles (fleet rate)</option>
+            <option value="10-19">10–19 vehicles (fleet rate)</option>
+            <option value="20+">20+ vehicles (volume rate)</option>
+          </select>
+
+          <label for="vehicle-type">Vehicle Type</label>
+          <input
+            type="text"
+            id="vehicle-type"
+            name="vehicle_type"
+            placeholder="e.g. Class 7 diesel semi, dump trucks, flatbeds"
+          />
+
+          <label for="location">Inspection Location (City/Address)</label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            required
+            placeholder="City or address where trucks are located"
+          />
+
+          <label for="preferred-date">Preferred Date</label>
+          <input
+            type="date"
+            id="preferred-date"
+            name="preferred_date"
+          />
+
+          <label for="notes">Additional Notes</label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows="3"
+            placeholder="Any specific requirements or questions"
+          ></textarea>
+
+          <!-- Honeypot — bot prevention, no label, hidden from users -->
+          <input
+            type="text"
+            name="_gotcha"
+            style="display:none"
+            tabindex="-1"
+            autocomplete="off"
+          />
+
+          <input type="hidden" name="region" value={region.id} />
+
+          <button type="submit">Request Inspection</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- Service area note — SAB context -->
+    <section>
+      <h2>Service Area — {region.name}</h2>
+      <p>
+        NorCal CARB Mobile serves the following cities in {region.name}:
+      </p>
+      <ul class="city-list">
+        {region.cities.map((city) => <li>{city}</li>)}
+      </ul>
+      <p>
+        Not in this list? Call us — we may still be able to serve your location.
+      </p>
+    </section>
+  </article>
+</Base>

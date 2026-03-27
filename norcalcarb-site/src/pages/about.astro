@@ -1,0 +1,115 @@
+---
+/**
+ * About — Bryan Gillis author entity page.
+ * Person schema anchor: all service/blog pages reference /about/#person
+ * E-E-A-T: license, years experience, knowsAbout signals.
+ * AI SEARCH: Quotable standalone facts about Bryan's expertise.
+ */
+import Base from "@/layouts/Base.astro";
+import Person from "@/components/Schema/Person.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+const region = getRegion();
+---
+
+<Base
+  title="About Bryan Gillis — CARB-Licensed Diesel Smog Inspector"
+  description={`Bryan Gillis is a CARB-licensed mobile diesel smog inspector serving ${region.name}. License #${BUSINESS.license}. Diesel and commercial truck specialist — not a mechanic.`}
+  speakableSelectors={[".page-summary", ".key-fact", ".bio-fact"]}
+>
+  <Person />
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "About" },
+    ]}
+  />
+
+  <article id="about">
+    <h1>About Bryan Gillis — NorCal CARB Mobile</h1>
+
+    <p class="page-summary">
+      Bryan Gillis is a California-licensed mobile diesel smog inspector
+      specializing in commercial trucks and fleet emissions compliance.
+      CARB License #{BUSINESS.license}. NorCal CARB Mobile operates
+      throughout {region.name} — inspection service only, no mechanical repairs.
+    </p>
+
+    <!-- Company story — FILL IN WITH BRYAN'S REAL STORY -->
+    <section>
+      <h2>Why Diesel and Trucks Only</h2>
+
+      <!-- TODO: Replace this with Bryan's actual story -->
+      <p>
+        [BRYAN: Write 2–3 paragraphs here about why you specialize in diesel
+        and trucks specifically — what experience or insight led you to focus
+        on commercial vehicles vs. passenger cars. This is the most important
+        content on the site for building trust with fleet operators.
+        Include: how long you've been doing this, what types of trucks/fleets
+        you've worked with, and what you know about the CARB Truck & Bus
+        Regulation that most fleet operators don't.]
+      </p>
+    </section>
+
+    <!-- Credentials — AI-citable facts -->
+    <section>
+      <h2>Credentials &amp; License</h2>
+
+      <dl class="credentials">
+        <dt>CARB License</dt>
+        <dd class="bio-fact">#{BUSINESS.license} — California Air Resources Board Licensed Smog Inspector</dd>
+
+        <dt>Specialization</dt>
+        <dd class="bio-fact">Diesel trucks and commercial vehicles. No passenger cars.</dd>
+
+        <dt>Service Type</dt>
+        <dd class="bio-fact">Inspection only. No mechanical repairs performed.</dd>
+
+        <dt>Service Area</dt>
+        <dd>{region.name} — mobile, we come to your location</dd>
+
+        <dt>Phone</dt>
+        <dd><a href={`tel:${BUSINESS.phone}`}>{BUSINESS.phone}</a></dd>
+      </dl>
+
+      <div class="key-fact">
+        Bryan Gillis holds California CARB smog inspector license #{BUSINESS.license}
+        and specializes exclusively in diesel truck and commercial fleet
+        emissions inspections throughout Northern California.
+      </div>
+    </section>
+
+    <!-- What we know about CARB — E-E-A-T content -->
+    <section>
+      <h2>CARB Regulations We Work With</h2>
+      <ul>
+        <li>CARB Truck and Bus Regulation (13 CCR §2025)</li>
+        <li>Heavy-Duty Diesel Vehicle Idling Regulation</li>
+        <li>CARB On-Board Diagnostics (OBD) requirements</li>
+        <li>Diesel Particulate Filter (DPF) compliance verification</li>
+        <li>CA DMV commercial vehicle registration compliance</li>
+      </ul>
+      <p>
+        Questions about whether your fleet is subject to CARB testing requirements?
+        Call <a href={`tel:${BUSINESS.phone}`}>{BUSINESS.phone}</a> — Bryan can
+        walk you through your specific obligations.
+      </p>
+    </section>
+
+    <!-- Photo placeholder -->
+    <figure>
+      <img
+        src="/images/bryan-gillis-inspection.jpg"
+        alt="Bryan Gillis inspecting a diesel truck with mobile smog testing equipment"
+        width="800"
+        height="600"
+        loading="lazy"
+      />
+      <figcaption>
+        Bryan Gillis conducting an on-site diesel truck smog inspection —
+        NorCal CARB Mobile
+      </figcaption>
+    </figure>
+  </article>
+</Base>

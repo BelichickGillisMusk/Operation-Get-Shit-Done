@@ -1,0 +1,214 @@
+---
+/**
+ * Base layout — wraps every page.
+ * Auto-injects: LocalBusiness schema, SEO Head, nav, footer.
+ * LocalBusiness schema is on EVERY page — not just homepage.
+ */
+import Head from "@/components/SEO/Head.astro";
+import LocalBusiness from "@/components/Schema/LocalBusiness.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  speakableSelectors?: string[];
+  cityOverride?: string; // For city pages — scopes areaServed
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage,
+  noindex,
+  speakableSelectors,
+  cityOverride,
+} = Astro.props;
+
+const region = getRegion();
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/services/diesel-smog-check", label: "Diesel Smog Check" },
+  { href: "/services/fleet-inspection", label: "Fleet Inspection" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Book Now" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head
+      {title}
+      {description}
+      {canonical}
+      {ogImage}
+      {noindex}
+      {speakableSelectors}
+    />
+    <!-- LocalBusiness schema on every page — AI crawlers index this per page -->
+    <LocalBusiness cityOverride={cityOverride} />
+  </head>
+  <body>
+    <!-- Skip nav for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header>
+      <nav aria-label="Main navigation">
+        <a href="/" class="brand" aria-label="NorCal CARB Mobile home">
+          <img
+            src="/images/norcalcarb-logo.svg"
+            alt="NorCal CARB Mobile"
+            width="180"
+            height="48"
+          />
+        </a>
+
+        <ul role="list">
+          {
+            navLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  aria-current={currentPath === link.href ? "page" : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <!-- Primary CTA — phone click-to-call -->
+        <a href={`tel:${region.phone}`} class="cta-phone">
+          {region.phone}
+        </a>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <footer>
+      <!-- Footer: Bryan bio strip, license, reviews preview, video strip -->
+      <div class="footer-trust">
+        <div class="footer-about">
+          <img
+            src="/images/bryan-gillis.jpg"
+            alt="Bryan Gillis, CARB-licensed diesel smog inspector"
+            width="64"
+            height="64"
+            loading="lazy"
+          />
+          <div>
+            <strong>Bryan Gillis</strong>
+            <span>CARB-Licensed Inspector</span>
+            <span>License #{BUSINESS.license}</span>
+          </div>
+        </div>
+
+        <div class="footer-rating" aria-label="Customer ratings">
+          <!-- Star rating strip — AggregateRating schema is in <head>, visual here -->
+          <span aria-hidden="true">★★★★★</span>
+          <span>5.0 — Diesel & Truck Fleet Specialists</span>
+        </div>
+      </div>
+
+      <div class="footer-nav">
+        <div>
+          <h3>Services</h3>
+          <ul role="list">
+            <li>
+              <a href="/services/diesel-smog-check">Diesel Smog Check</a>
+            </li>
+            <li><a href="/services/truck-smog-check">Truck Smog Check</a></li>
+            <li>
+              <a href="/services/fleet-inspection">Fleet Inspection</a>
+            </li>
+            <li>
+              <a href="/services/carb-compliance-check"
+                >CARB Compliance Check</a
+              >
+            </li>
+            <li>
+              <a href="/services/mobile-smog-station">Mobile Smog Station</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Cities Served</h3>
+          <ul role="list">
+            {
+              region.cities.slice(0, 5).map((city) => (
+                <li>
+                  <a href={`/cities/${city.toLowerCase().replace(/\s+/g, "-")}`}>
+                    {city}
+                  </a>
+                </li>
+              ))
+            }
+            <li><a href="/cities">All Cities →</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Company</h3>
+          <ul role="list">
+            <li><a href="/about">About Bryan</a></li>
+            <li><a href="/reviews">Reviews</a></li>
+            <li><a href="/videos">CARB Videos</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Contact</h3>
+          <address>
+            <a href={`tel:${region.phone}`}>{region.phone}</a>
+            <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>
+            <span>Mobile Service — {region.name}</span>
+          </address>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          &copy; {new Date().getFullYear()} NorCal CARB Mobile &mdash; CARB License #{BUSINESS.license}
+          &mdash; Diesel &amp; Truck Smog Specialists
+        </p>
+        <p class="footer-disclaimer">
+          We do not perform mechanical repairs. We are a licensed smog inspection
+          service only.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+  .footer-disclaimer {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+</style>

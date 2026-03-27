@@ -1,0 +1,32 @@
+---
+import Base from "@/layouts/Base.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getRegion } from "@/config/regions";
+
+const region = getRegion();
+---
+
+<Base
+  title={`Cities Served — ${region.name} Diesel Smog Inspection`}
+  description={`NorCal CARB Mobile serves these cities in ${region.name} for mobile diesel truck smog inspections.`}
+>
+  <BreadcrumbList
+    crumbs={[{ name: "Home", url: "/" }, { name: "Cities" }]}
+  />
+  <h1>Cities Served — {region.name}</h1>
+  <p class="page-summary">
+    NorCal CARB Mobile provides mobile diesel smog inspections throughout
+    {region.name}. We serve all cities listed below — we come to your location.
+  </p>
+  <ul role="list" class="city-grid">
+    {
+      region.cities.map((city) => (
+        <li>
+          <a href={`/cities/${city.toLowerCase().replace(/\s+/g, "-")}`}>
+            {city}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

@@ -1,0 +1,70 @@
+---
+/**
+ * Video hub — CARB University.
+ * VideoObject schema per video. AI citation target for "how does diesel smog work" queries.
+ */
+import Base from "@/layouts/Base.astro";
+import VideoObject from "@/components/Schema/VideoObject.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import { getCollection } from "astro:content";
+import { getRegion } from "@/config/regions";
+
+const region = getRegion();
+const allVideos = await getCollection("videos", (v) => v.data.published);
+const sorted = allVideos.sort((a, b) =>
+  b.data.uploadDate.localeCompare(a.data.uploadDate)
+);
+---
+
+<Base
+  title={`Diesel Smog Inspection Videos — CARB University`}
+  description={`Watch NorCal CARB Mobile's diesel truck smog inspection walkthroughs, CARB regulation guides, and fleet compliance videos.`}
+  speakableSelectors={[".page-summary", "h1"]}
+>
+  {sorted.map((v) => (
+    <VideoObject
+      name={v.data.title}
+      description={v.data.description}
+      youtubeId={v.data.youtubeId}
+      uploadDate={v.data.uploadDate}
+      duration={v.data.duration}
+    />
+  ))}
+  <BreadcrumbList
+    crumbs={[{ name: "Home", url: "/" }, { name: "Videos" }]}
+  />
+
+  <article>
+    <h1>CARB Videos — Diesel Smog Inspection Guides</h1>
+    <p class="page-summary">
+      Video walkthroughs of mobile diesel smog inspections, CARB Truck &amp;
+      Bus Regulation guides, and fleet compliance tips from NorCal CARB Mobile.
+    </p>
+
+    {sorted.length === 0 ? (
+      <p>Videos coming soon. Call {region.phone} for information.</p>
+    ) : (
+      <ul role="list" class="video-grid">
+        {sorted.map((v) => (
+          <li>
+            <a
+              href={`https://www.youtube.com/watch?v=${v.data.youtubeId}`}
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src={`https://img.youtube.com/vi/${v.data.youtubeId}/mqdefault.jpg`}
+                alt={v.data.title}
+                width="320"
+                height="180"
+                loading="lazy"
+              />
+              <h2>{v.data.title}</h2>
+              <p>{v.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </article>
+</Base>

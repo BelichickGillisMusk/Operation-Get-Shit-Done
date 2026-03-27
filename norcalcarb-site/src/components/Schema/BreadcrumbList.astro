@@ -1,0 +1,35 @@
+---
+/**
+ * BreadcrumbList schema — on all interior pages.
+ * Enables sitelinks breadcrumbs in Google SERP.
+ */
+import { getRegion } from "@/config/regions";
+
+export interface Crumb {
+  name: string;
+  url?: string; // Omit for the current (last) crumb
+}
+
+interface Props {
+  crumbs: Crumb[];
+}
+
+const { crumbs } = Astro.props;
+const region = getRegion();
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: crumbs.map((crumb, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: crumb.name,
+    ...(crumb.url && { item: `${region.host}${crumb.url}` }),
+  })),
+};
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(schema)}
+/>

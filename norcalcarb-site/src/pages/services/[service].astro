@@ -1,0 +1,123 @@
+---
+/**
+ * Dynamic service pages — one per service in content/services/
+ * Schema: Service + FAQPage + VideoObject (if video exists) + BreadcrumbList
+ * AI SEARCH: definition-first content from .md file
+ */
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import Service from "@/components/Schema/Service.astro";
+import FAQPage from "@/components/Schema/FAQPage.astro";
+import VideoObject from "@/components/Schema/VideoObject.astro";
+import BreadcrumbList from "@/components/Schema/BreadcrumbList.astro";
+import AggregateRating from "@/components/Schema/AggregateRating.astro";
+import { getRegion, BUSINESS } from "@/config/regions";
+
+export async function getStaticPaths() {
+  const services = await getCollection("services", (s) => s.data.published);
+  return services.map((service) => ({
+    params: { service: service.slug },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const { Content } = await service.render();
+const region = getRegion();
+const data = service.data;
+---
+
+<Base
+  title={`${data.title} — ${region.name}`}
+  description={data.description}
+  speakableSelectors={[".page-summary", ".key-fact", "h1"]}
+>
+  <Service
+    name={data.title}
+    description={data.description}
+    priceRange={data.priceRange}
+    serviceOutput={data.serviceOutput}
+  />
+  <FAQPage faqs={data.faqs} />
+  {
+    data.youtubeId && data.youtubeId !== "REPLACE_WITH_YOUTUBE_ID" && (
+      <VideoObject
+        name={data.youtubeTitle ?? data.title}
+        description={data.description}
+        youtubeId={data.youtubeId}
+        uploadDate={data.youtubeUploadDate ?? "2025-01-01"}
+        duration={data.youtubeDuration ?? "PT3M00S"}
+      />
+    )
+  }
+  <AggregateRating />
+  <BreadcrumbList
+    crumbs={[
+      { name: "Home", url: "/" },
+      { name: "Services", url: "/services" },
+      { name: data.title },
+    ]}
+  />
+
+  <article>
+    <h1>{data.title} — {region.name}</h1>
+
+    {data.priceRange && (
+      <p class="page-summary">
+        <strong>Price:</strong> {data.priceRange} &mdash; {data.description}
+      </p>
+    )}
+
+    <!-- YouTube embed if video ID provided -->
+    {
+      data.youtubeId && data.youtubeId !== "REPLACE_WITH_YOUTUBE_ID" && (
+        <div class="video-embed">
+          <iframe
+            src={`https://www.youtube.com/embed/${data.youtubeId}`}
+            title={data.youtubeTitle ?? data.title}
+            width="560"
+            height="315"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          />
+        </div>
+      )
+    }
+
+    <!-- Markdown content from .md file (definition-first, key facts, how-to) -->
+    <div class="service-content">
+      <Content />
+    </div>
+
+    <!-- FAQ section — prompt-language questions for AI citation -->
+    <section class="faq-section">
+      <h2>Common Questions</h2>
+      <dl>
+        {
+          data.faqs.map((faq) => (
+            <>
+              <dt>{faq.question}</dt>
+              <dd>{faq.answer}</dd>
+            </>
+          ))
+        }
+      </dl>
+    </section>
+
+    <!-- Not a mechanic disclaimer — prominent, AI-indexable -->
+    <div class="key-fact">
+      NorCal CARB Mobile is a CARB-licensed smog inspection service.
+      We do not perform mechanical repairs. Diesel and commercial trucks
+      only — no passenger cars. License #{BUSINESS.license}.
+    </div>
+
+    <div class="cta-block">
+      <a href={`tel:${region.phone}`} class="cta-primary">
+        Call {region.phone}
+      </a>
+      <a href="/contact" class="cta-secondary">Book Inspection</a>
+      <a href="/pricing">View Pricing</a>
+    </div>
+  </article>
+</Base>

@@ -1,0 +1,79 @@
+---
+/**
+ * LocalBusiness schema — SAB (Service Area Business) version.
+ * No storefront address. Uses areaServed only per Google SAB guidelines.
+ * Injected on EVERY page via Base.astro layout.
+ */
+import { getRegion, BUSINESS } from "@/config/regions";
+
+interface Props {
+  cityOverride?: string; // For city-specific pages, scope areaServed to one city
+}
+
+const { cityOverride } = Astro.props;
+const region = getRegion();
+
+const areaServed = cityOverride
+  ? [{ "@type": "City", name: cityOverride }]
+  : region.cities.map((city) => ({ "@type": "City", name: city }));
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": `${region.host}/#business`,
+  name: `${BUSINESS.name} - ${region.name}`,
+  legalName: BUSINESS.legalName,
+  description: region.metaDescription,
+  telephone: region.phone,
+  email: BUSINESS.email,
+  url: region.host,
+  logo: {
+    "@type": "ImageObject",
+    url: `${region.host}${BUSINESS.logo}`,
+  },
+  founder: {
+    "@type": "Person",
+    name: BUSINESS.owner,
+    "@id": `${region.host}/about/#person`,
+  },
+  // SAB: no address — mobile service only
+  // Per Google: SABs should NOT show address in GBP or schema
+  serviceType: [
+    "Mobile Diesel Smog Inspection",
+    "Truck Smog Check",
+    "Fleet Emissions Inspection",
+    "CARB Compliance Inspection",
+    "Heavy-Duty Diesel Emissions Testing",
+  ],
+  areaServed,
+  hasCredential: {
+    "@type": "EducationalOccupationalCredential",
+    credentialCategory: "license",
+    name: "California CARB Smog Inspector License",
+    identifier: BUSINESS.license,
+  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "07:00",
+      closes: "18:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Saturday"],
+      opens: "08:00",
+      closes: "14:00",
+    },
+  ],
+  priceRange: "$$",
+  currenciesAccepted: "USD",
+  paymentAccepted: "Cash, Credit Card, Check",
+  sameAs: BUSINESS.sameAs,
+};
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(schema)}
+/>
