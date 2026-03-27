@@ -12,6 +12,7 @@ const tabs = [
   { id: 'slack', label: 'Slack', icon: '\u0023' },
   { id: 'finances', label: 'Finances', icon: '\u0024' },
   { id: 'gcp', label: 'GCP', icon: '\u2601' },
+  { id: 'coverage', label: 'Coverage', icon: '\u25CE' },
 ];
 
 export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
