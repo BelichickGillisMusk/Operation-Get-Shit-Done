@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 // ── Market Tier Types ──────────────────────────────────────────────
-type MarketTier = 'primary' | 'connector' | 'support';
-type Corridor = '99' | '580' | '4' | 'bayArea' | 'northValley';
+type MarketTier = 'primary' | 'connector' | 'support' | 'opportunity';
+type Corridor = '99' | '580' | '4' | 'bayArea' | 'northValley' | 'i5north' | '101';
 
 interface MarketLocation {
   id: string;
@@ -16,6 +16,8 @@ interface MarketLocation {
   corridor: Corridor[];
   registeredVehicles: string;
   nonComplianceLevel: 'very-high' | 'high' | 'moderate' | 'lower';
+  fleetSegments?: string[];
+  providers?: string;
   note?: string;
 }
 
@@ -44,6 +46,14 @@ const TIER_CONFIG = {
     markerRadius: 4.5,
     zoneRadius: 22,
     zoneOpacity: 0.06,
+  },
+  opportunity: {
+    color: '#ef4444',
+    glow: '#ef444430',
+    label: 'UNDERSERVED — GOLD MINE',
+    markerRadius: 6,
+    zoneRadius: 35,
+    zoneOpacity: 0.12,
   },
 };
 
@@ -83,6 +93,14 @@ const markets: MarketLocation[] = [
   { id: 'lodi', name: 'Lodi', tier: 'support', x: 310, y: 300, county: 'San Joaquin', corridor: ['99'], registeredVehicles: '~460K', nonComplianceLevel: 'very-high', note: 'Hwy 99 corridor' },
   { id: 'stockton-support', name: 'Stockton (2nd Page)', tier: 'support', x: 345, y: 355, county: 'San Joaquin', corridor: ['99', '4'], registeredVehicles: '~460K', nonComplianceLevel: 'very-high' },
   { id: 'san-diego', name: 'San Diego', tier: 'support', x: 460, y: 590, county: 'San Diego', corridor: [], registeredVehicles: '~2.1M', nonComplianceLevel: 'moderate', note: 'mobilecarbsmoketest.com — Expansion' },
+
+  // UNDERSERVED OPPORTUNITIES (6) — Redding first, work south
+  { id: 'redding', name: 'Redding', tier: 'opportunity', x: 240, y: 10, county: 'Shasta', corridor: ['i5north'], registeredVehicles: '~110K', nonComplianceLevel: 'high', fleetSegments: ['Logging', 'Construction', 'I-5 Trucking'], providers: '2-4', note: 'Same drive as Fresno — way less competition' },
+  { id: 'red-bluff', name: 'Red Bluff', tier: 'opportunity', x: 258, y: 28, county: 'Tehama', corridor: ['i5north'], registeredVehicles: '~30K', nonComplianceLevel: 'very-high', fleetSegments: ['Cattle', 'Olives', 'Hay Haulers'], providers: '~0-1', note: 'I-5 hub between Redding & Chico' },
+  { id: 'oroville', name: 'Oroville', tier: 'opportunity', x: 295, y: 65, county: 'Butte', corridor: ['northValley'], registeredVehicles: '~40K', nonComplianceLevel: 'high', fleetSegments: ['Rice', 'Citrus', 'Dam Rebuild', 'PG&E'], providers: '~0', note: 'Post-fire construction boom' },
+  { id: 'susanville', name: 'Susanville', tier: 'opportunity', x: 415, y: 35, county: 'Lassen', corridor: [], registeredVehicles: '~15K', nonComplianceLevel: 'very-high', fleetSegments: ['Logging', 'Ranching', 'Prison Fleets'], providers: '~0', note: 'ZERO providers. 2+ hrs from anyone.' },
+  { id: 'ukiah', name: 'Ukiah', tier: 'opportunity', x: 48, y: 145, county: 'Mendocino', corridor: ['101'], registeredVehicles: '~50K', nonComplianceLevel: 'high', fleetSegments: ['Wine', 'Timber', 'Cannabis'], providers: '~0', note: '2 hrs from Santa Rosa. Zero OVI.' },
+  { id: 'eureka', name: 'Eureka', tier: 'opportunity', x: 28, y: 35, county: 'Humboldt', corridor: ['101'], registeredVehicles: '~75K', nonComplianceLevel: 'high', fleetSegments: ['Logging', 'Dairy', 'Cannabis', 'Port'], providers: '~0', note: '4+ hrs from Sac. Timber mills + dairy.' },
 ];
 
 // ── Highway Corridors ──────────────────────────────────────────────
@@ -108,6 +126,20 @@ const corridors: { id: string; name: string; color: string; path: string; label:
     label: 'HWY 4',
     path: 'M155,310 L225,305 L280,310 L330,340',
   },
+  {
+    id: 'i5north',
+    name: 'I-5 North',
+    color: '#ef4444',
+    label: 'I-5 N',
+    path: 'M240,10 L258,28 L270,48 L290,120 L305,210',
+  },
+  {
+    id: 'hwy101',
+    name: 'US-101',
+    color: '#a855f7',
+    label: '101',
+    path: 'M28,35 L38,90 L48,145 L68,180 L78,208',
+  },
 ];
 
 // ── Simplified NorCal Coastline Path ────────────────────────────────
@@ -130,6 +162,7 @@ export default function CoverageMap() {
   const primaryCount = markets.filter((m) => m.tier === 'primary').length;
   const connectorCount = markets.filter((m) => m.tier === 'connector').length;
   const supportCount = markets.filter((m) => m.tier === 'support').length;
+  const opportunityCount = markets.filter((m) => m.tier === 'opportunity').length;
 
   const hovered = markets.find((m) => m.id === hoveredMarket);
 
@@ -144,7 +177,7 @@ export default function CoverageMap() {
           </p>
         </div>
         <div className="flex gap-2">
-          {(['all', 'primary', 'connector', 'support'] as const).map((tier) => (
+          {(['all', 'opportunity', 'primary', 'connector', 'support'] as const).map((tier) => (
             <button
               key={tier}
               onClick={() => setSelectedTier(tier)}
@@ -224,6 +257,10 @@ export default function CoverageMap() {
                 <stop offset="0%" stopColor="#00ff41" stopOpacity="0.08" />
                 <stop offset="100%" stopColor="#00ff41" stopOpacity="0" />
               </radialGradient>
+              <radialGradient id="zone-opportunity" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ef4444" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+              </radialGradient>
             </defs>
 
             {/* NorCal outline */}
@@ -248,8 +285,8 @@ export default function CoverageMap() {
                 />
                 {/* Label at start of path */}
                 <text
-                  x={c.id === 'hwy99' ? 260 : c.id === 'i580' ? 85 : 145}
-                  y={c.id === 'hwy99' ? 55 : c.id === 'i580' ? 315 : 300}
+                  x={c.id === 'hwy99' ? 260 : c.id === 'i580' ? 85 : c.id === 'i5north' ? 220 : c.id === 'hwy101' ? 15 : 145}
+                  y={c.id === 'hwy99' ? 55 : c.id === 'i580' ? 315 : c.id === 'i5north' ? 8 : c.id === 'hwy101' ? 30 : 300}
                   fill={c.color}
                   fontSize="9"
                   fontWeight="bold"
@@ -285,8 +322,8 @@ export default function CoverageMap() {
                   onMouseLeave={() => setHoveredMarket(null)}
                   style={{ cursor: 'pointer' }}
                 >
-                  {/* Outer pulse ring for primary */}
-                  {m.tier === 'primary' && (
+                  {/* Outer pulse ring for primary + opportunity */}
+                  {(m.tier === 'primary' || m.tier === 'opportunity') && (
                     <circle
                       cx={m.x}
                       cy={m.y}
@@ -364,35 +401,24 @@ export default function CoverageMap() {
             })}
 
             {/* Hover tooltip */}
-            {hovered && hovered.id !== 'san-diego' && (
-              <g>
-                <rect
-                  x={hovered.x + 14}
-                  y={hovered.y - 35}
-                  width="145"
-                  height={hovered.note ? 58 : 44}
-                  rx="4"
-                  fill="#111"
-                  stroke={TIER_CONFIG[hovered.tier].color}
-                  strokeWidth="1"
-                  opacity="0.95"
-                />
-                <text x={hovered.x + 20} y={hovered.y - 20} fill="#fff" fontSize="9" fontWeight="bold">
-                  {hovered.name}
-                </text>
-                <text x={hovered.x + 20} y={hovered.y - 8} fill="#888" fontSize="7.5">
-                  {hovered.county} County — {hovered.registeredVehicles} vehicles
-                </text>
-                <text x={hovered.x + 20} y={hovered.y + 4} fill={NON_COMPLIANCE_COLORS[hovered.nonComplianceLevel]} fontSize="7.5" fontWeight="bold">
-                  Non-compliance: {hovered.nonComplianceLevel.toUpperCase()}
-                </text>
-                {hovered.note && (
-                  <text x={hovered.x + 20} y={hovered.y + 16} fill="#666" fontSize="7">
-                    {hovered.note}
+            {hovered && hovered.id !== 'san-diego' && (() => {
+              const tx = hovered.x > 300 ? hovered.x - 165 : hovered.x + 14;
+              const lines = [hovered.fleetSegments?.join(', '), hovered.providers ? `Providers: ${hovered.providers}` : null, hovered.note].filter(Boolean);
+              const h = 48 + lines.length * 12;
+              return (
+                <g>
+                  <rect x={tx} y={hovered.y - 38} width="155" height={h} rx="4" fill="#111" stroke={TIER_CONFIG[hovered.tier].color} strokeWidth="1" opacity="0.95" />
+                  <text x={tx + 6} y={hovered.y - 22} fill="#fff" fontSize="9" fontWeight="bold">{hovered.name}</text>
+                  <text x={tx + 6} y={hovered.y - 10} fill="#888" fontSize="7.5">{hovered.county} County — {hovered.registeredVehicles} vehicles</text>
+                  <text x={tx + 6} y={hovered.y + 2} fill={NON_COMPLIANCE_COLORS[hovered.nonComplianceLevel]} fontSize="7.5" fontWeight="bold">
+                    Non-compliance: {hovered.nonComplianceLevel.toUpperCase()}
                   </text>
-                )}
-              </g>
-            )}
+                  {lines.map((line, i) => (
+                    <text key={i} x={tx + 6} y={hovered.y + 14 + i * 12} fill={i === 1 && hovered.providers?.includes('0') ? '#ef4444' : '#666'} fontSize="7">{line}</text>
+                  ))}
+                </g>
+              );
+            })()}
 
             {/* Corridor legend */}
             <g>
@@ -424,9 +450,10 @@ export default function CoverageMap() {
         <div className="w-full lg:w-80 space-y-4">
           {/* Tier Groups */}
           {[
-            { tier: 'primary' as MarketTier, label: 'PRIMARY MARKETS', emoji: '' },
-            { tier: 'connector' as MarketTier, label: 'CRITICAL CONNECTORS', emoji: '' },
-            { tier: 'support' as MarketTier, label: 'SUPPORT PAGES', emoji: '' },
+            { tier: 'opportunity' as MarketTier, label: 'UNDERSERVED GOLD MINES' },
+            { tier: 'primary' as MarketTier, label: 'PRIMARY MARKETS' },
+            { tier: 'connector' as MarketTier, label: 'CRITICAL CONNECTORS' },
+            { tier: 'support' as MarketTier, label: 'SUPPORT PAGES' },
           ].map(({ tier, label }) => {
             const tierMarkets = markets.filter((m) => m.tier === tier);
             const cfg = TIER_CONFIG[tier];
@@ -467,8 +494,14 @@ export default function CoverageMap() {
                           {m.name}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="text-gray-600">{m.county}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        {m.providers && (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                            m.providers.includes('0') ? 'bg-red-500/20 text-red-400' : 'bg-gray-800 text-gray-500'
+                          }`}>
+                            {m.providers}
+                          </span>
+                        )}
                         <span
                           className="font-medium"
                           style={{ color: NON_COMPLIANCE_COLORS[m.nonComplianceLevel] }}
@@ -485,36 +518,87 @@ export default function CoverageMap() {
             );
           })}
 
-          {/* Neediest Markets Callout */}
+          {/* Expansion Strategy */}
           <div className="bg-[#1a1a1a] rounded-lg border border-red-500/30 p-4">
-            <p className="text-xs font-bold tracking-wider text-red-400 mb-2">
-              NEEDIEST MARKETS (HIGHEST OPPORTUNITY)
+            <p className="text-xs font-bold tracking-wider text-red-400 mb-1">
+              EXPANSION: REDDING FIRST
             </p>
-            <div className="space-y-1.5">
-              {markets
-                .filter((m) => m.nonComplianceLevel === 'very-high')
-                .map((m) => (
-                  <div key={m.id} className="flex items-center justify-between text-xs">
-                    <span className="text-white font-medium">{m.name}</span>
-                    <span className="text-red-400">{m.registeredVehicles} vehicles</span>
-                  </div>
-                ))}
-              <p className="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-800">
-                San Joaquin Valley &amp; Sacramento — Enhanced smog area, 38.2% non-compliance, older vehicle fleets
-              </p>
+            <p className="text-[10px] text-gray-500 mb-3">
+              Same 2.5hr drive as Fresno — but Fresno has competition. North is WIDE OPEN.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-start gap-2">
+                <span className="text-red-400 font-mono w-4">1</span>
+                <span className="text-gray-300">Redding &rarr; Red Bluff &rarr; Chico &rarr; Oroville</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-red-400 font-mono w-4">2</span>
+                <span className="text-gray-300">Susanville (1.5hr east of Redding)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-purple-400 font-mono w-4">3</span>
+                <span className="text-gray-300">Ukiah &rarr; Eureka (coast loop)</span>
+              </div>
             </div>
+          </div>
+
+          {/* Pricing & Referral */}
+          <div className="bg-[#1a1a1a] rounded-lg border border-green-500/30 p-4">
+            <p className="text-xs font-bold tracking-wider text-green-400 mb-2">
+              PRICING — NORTH MARKETS
+            </p>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Per truck</span>
+                <span className="text-green-400 font-bold">$100–200</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Penalty if they skip</span>
+                <span className="text-red-400 font-bold">$500/yr</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">5 fleets × 20 trucks</span>
+                <span className="text-white font-bold">$15K/visit</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">6 markets × 2 visits/yr</span>
+                <span className="text-[#facc15] font-bold">$180K/yr</span>
+              </div>
+              <div className="mt-2 pt-2 border-t border-gray-800">
+                <p className="text-gray-500">Referral: Fleet refers fleet = money back on next test</p>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Strategy */}
+          <div className="bg-[#1a1a1a] rounded-lg border border-purple-500/30 p-4">
+            <p className="text-xs font-bold tracking-wider text-purple-400 mb-2">
+              AI-FIRST STRATEGY (GEO)
+            </p>
+            <ul className="text-[11px] text-gray-400 space-y-1 list-disc list-inside">
+              <li>llms.txt + robots.txt (allow GPTBot)</li>
+              <li>JSON-LD schema on every page</li>
+              <li>Answer capsule in first 60 words</li>
+              <li>FAQ + Glossary + Video + Reviews</li>
+              <li>Cited sources (CARB.ca.gov)</li>
+              <li>Entity authority (Reddit, YouTube, forums)</li>
+            </ul>
+            <p className="text-[10px] text-gray-600 mt-2">
+              AI search up 527% YoY. Only 12.4% of sites have structured data.
+            </p>
           </div>
         </div>
       </div>
 
       {/* Coverage Stats Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         {[
-          { label: 'PRIMARY MARKETS', value: primaryCount, color: '#facc15', border: 'border-[#facc15]/50' },
+          { label: 'GOLD MINES', value: opportunityCount, color: '#ef4444', border: 'border-red-500/50' },
+          { label: 'PRIMARY', value: primaryCount, color: '#facc15', border: 'border-[#facc15]/50' },
           { label: 'CONNECTORS', value: connectorCount, color: '#3b82f6', border: 'border-[#3b82f6]/50' },
-          { label: 'SUPPORT PAGES', value: supportCount, color: '#00ff41', border: 'border-[#00ff41]/50' },
-          { label: 'TOTAL COVERAGE', value: primaryCount + connectorCount + supportCount, color: '#fff', border: 'border-white/20' },
-          { label: 'CORRIDORS', value: '3 HWY', color: '#a855f7', border: 'border-[#a855f7]/50' },
+          { label: 'SUPPORT', value: supportCount, color: '#00ff41', border: 'border-[#00ff41]/50' },
+          { label: 'TOTAL MARKETS', value: markets.length, color: '#fff', border: 'border-white/20' },
+          { label: 'CORRIDORS', value: '5 HWY', color: '#a855f7', border: 'border-[#a855f7]/50' },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -526,6 +610,28 @@ export default function CoverageMap() {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Sites Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="bg-[#1a1a1a] rounded-lg p-4 border border-red-500/20">
+          <h4 className="text-sm font-medium text-red-400">carbteststockton.com</h4>
+          <p className="text-xs text-gray-500 mt-1">San Joaquin Valley — Stockton, Lodi, Tracy, Modesto</p>
+          <p className="text-xs text-gray-400 mt-2">Ag / Logistics / Construction fleets</p>
+          <p className="text-[10px] text-gray-600 mt-1">8 core + 6 AI-citation + 4 tech files</p>
+        </div>
+        <div className="bg-[#1a1a1a] rounded-lg p-4 border border-orange-500/20">
+          <h4 className="text-sm font-medium text-orange-400">mobilesmoketest.com</h4>
+          <p className="text-xs text-gray-500 mt-1">Tracy-Concord Corridor — I-580</p>
+          <p className="text-xs text-gray-400 mt-2">Connects Valley to Bay Area</p>
+          <p className="text-[10px] text-gray-600 mt-1">7 core + 6 AI-citation + tech files</p>
+        </div>
+        <div className="bg-[#1a1a1a] rounded-lg p-4 border border-blue-500/20">
+          <h4 className="text-sm font-medium text-blue-400">NorCal Hub (8 city pages)</h4>
+          <p className="text-xs text-gray-500 mt-1">Sac + Bay Area + Santa Rosa + Chico + North</p>
+          <p className="text-xs text-gray-400 mt-2">Each: LocalBusiness schema + FAQ + answer capsule</p>
+          <p className="text-[10px] text-gray-600 mt-1">llms.txt + JSON-LD + cited sources</p>
+        </div>
       </div>
     </div>
   );
