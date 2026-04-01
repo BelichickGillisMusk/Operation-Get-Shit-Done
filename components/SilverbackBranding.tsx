@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 interface LogoConcept {
   id: number;
   title: string;
@@ -581,97 +579,22 @@ const concepts: LogoConcept[] = [
 ];
 
 export default function SilverbackBranding() {
-  const [selected, setSelected] = useState<number | null>(null);
-
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-[#1a1a1a] rounded-xl p-6 border border-gray-800">
-        <div className="flex items-start gap-4">
-          <div className="text-4xl">🦍</div>
-          <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">
-              Silverback AI Agency — Brand Concepts
-            </h2>
-            <p className="mt-1 text-gray-400 text-sm leading-relaxed max-w-2xl">
-              10 logo concepts built around three pillars:{' '}
-              <span className="text-[#facc15] font-semibold">Strength</span>,{' '}
-              <span className="text-blue-400 font-semibold">Wisdom</span>, and{' '}
-              <span className="text-green-400 font-semibold">Compassion</span> for those who
-              may be left behind during the AI transition. Click any concept to expand its story.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div>
+      <p className="text-xs text-gray-500 mb-4 tracking-widest uppercase">
+        Silverback AI — 10 Logo Concepts
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {concepts.map((concept) => (
-          <button
-            key={concept.id}
-            onClick={() => setSelected(selected === concept.id ? null : concept.id)}
-            className={`
-              group flex flex-col items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left
-              ${
-                selected === concept.id
-                  ? 'border-[#facc15] bg-[#1a1a1a] shadow-lg shadow-yellow-900/30'
-                  : 'border-gray-800 bg-[#111] hover:border-gray-600 hover:bg-[#1a1a1a]'
-              }
-            `}
-          >
+          <div key={concept.id} className="flex flex-col items-center gap-2">
             <div className="w-full aspect-square">
               {concept.svg}
             </div>
-            <div className="w-full">
-              <p className="text-xs font-bold text-white group-hover:text-[#facc15] transition-colors">
-                {concept.id}. {concept.title}
-              </p>
-              <p className="text-[10px] text-gray-500 mt-0.5">{concept.tagline}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Expanded detail panel */}
-      {selected !== null && (() => {
-        const c = concepts.find((x) => x.id === selected)!;
-        return (
-          <div className="bg-[#1a1a1a] border border-[#facc15]/30 rounded-xl p-6 flex flex-col md:flex-row gap-6">
-            <div className="w-40 h-40 flex-shrink-0 mx-auto md:mx-0">
-              {c.svg}
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] text-[#facc15] font-bold tracking-widest uppercase mb-1">
-                Concept {c.id}
-              </p>
-              <h3 className="text-xl font-bold text-white">{c.title}</h3>
-              <p className="text-sm text-gray-400 italic mb-3">&ldquo;{c.tagline}&rdquo;</p>
-              <p className="text-sm text-gray-300 leading-relaxed">{c.description}</p>
-              <div className="mt-4 flex gap-3 flex-wrap">
-                <span className="px-3 py-1 rounded-full bg-gray-800 text-xs text-gray-300">
-                  ✓ Business cards
-                </span>
-                <span className="px-3 py-1 rounded-full bg-gray-800 text-xs text-gray-300">
-                  ✓ Screen-print shirts
-                </span>
-                <span className="px-3 py-1 rounded-full bg-gray-800 text-xs text-gray-300">
-                  ✓ Scalable SVG
-                </span>
-                <span className="px-3 py-1 rounded-full bg-gray-800 text-xs text-gray-300">
-                  ✓ Dark & light variants possible
-                </span>
-              </div>
-            </div>
+            <p className="text-xs text-center text-gray-400">
+              {concept.id}. {concept.title}
+            </p>
           </div>
-        );
-      })()}
-
-      {/* Usage note */}
-      <div className="bg-[#111] border border-gray-800 rounded-xl p-4 text-xs text-gray-500 leading-relaxed">
-        <strong className="text-gray-400">Next steps:</strong> Select your favourite concept
-        (or mix elements from multiple concepts), then hand the chosen SVG to a graphic designer
-        for production-quality vector artwork. Each logo above is exported as a scalable SVG —
-        perfect for print (business cards, shirts) and digital use at any resolution.
+        ))}
       </div>
     </div>
   );
