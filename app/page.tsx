@@ -7,6 +7,7 @@ import ChatWindow from '@/components/ChatWindow';
 import SlackPanel from '@/components/SlackPanel';
 import FinancesPanel from '@/components/FinancesPanel';
 import GCPPanel from '@/components/GCPPanel';
+import SilverbackBranding from '@/components/SilverbackBranding';
 import dynamic from 'next/dynamic';
 
 const TerminalEmbed = dynamic(() => import('@/components/TerminalEmbed'), {
@@ -50,6 +51,7 @@ export default function Home() {
           {activeTab === 'slack' && <SlackPanel />}
           {activeTab === 'finances' && <FinancesPanel />}
           {activeTab === 'gcp' && <GCPPanel />}
+          {activeTab === 'branding' && <SilverbackBranding />}
         </div>
       </div>
     </main>
