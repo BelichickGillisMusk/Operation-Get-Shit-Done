@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GM Command Center | Operation Get Shit Done',
-  description: 'Command center for NorCal CARB Mobile — Bryan Gillis',
+  title: 'Silverback AI Agency | What keeps you up at night?',
+  description:
+    'Ops + AI strike team shipping reliable automations, agents, and runbooks for the problems that keep you up at night.',
 };
 
 export default function RootLayout({
