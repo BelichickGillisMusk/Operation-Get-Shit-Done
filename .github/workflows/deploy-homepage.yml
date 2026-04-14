@@ -1,0 +1,33 @@
+name: Deploy Homepage to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'homepage'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy silverbackai.agency homepage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p dist
+          cp homepage dist/index.html
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=silverbackai-agency --branch=main --commit-dirty=true
