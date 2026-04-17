@@ -1,0 +1,12 @@
+name = "silverbackai"
+main = "worker.js"
+compatibility_date = "2025-04-01"
+account_id = "bafa242dd95d3fdce72540d20accd0a2"
+
+# Routes are configured in the Cloudflare dashboard:
+#   silverbackai.agency/*
+#   www.silverbackai.agency/*
+
+[[kv_namespaces]]
+binding = "SILVERBACK"
+id = "0131ae3b039f4d40affb62c513cef2c9"

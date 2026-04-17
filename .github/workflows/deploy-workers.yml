@@ -1,4 +1,4 @@
-name: Deploy Clean Truck Check Workers
+name: Deploy All Workers
 
 on:
   push:
@@ -51,3 +51,14 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2
           workingDirectory: workers/stockton
+
+  deploy-silverbackai:
+    runs-on: ubuntu-latest
+    name: Deploy SilverbackAI + Samantha
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: bafa242dd95d3fdce72540d20accd0a2
+          workingDirectory: workers/silverbackai
