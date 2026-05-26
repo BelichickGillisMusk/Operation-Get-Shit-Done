@@ -30,11 +30,11 @@ jobs:
         run: |
           echo "${{ secrets.ANTHROPIC_API_KEY }}" | npx wrangler secret put ANTHROPIC_API_KEY
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFARE_TOKEN: ${{ secrets.CLOUDFARE_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: bafa242dd95d3fdce72540d20accd0a2
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFARE_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2

@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFARE_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2
           workingDirectory: workers/hayward
 
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFARE_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2
           workingDirectory: workers/fairfield
 
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFARE_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2
           workingDirectory: workers/roseville
 
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFARE_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2
           workingDirectory: workers/stockton
 
@@ -59,6 +59,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFARE_TOKEN }}
           accountId: bafa242dd95d3fdce72540d20accd0a2
           workingDirectory: workers/silverbackai
